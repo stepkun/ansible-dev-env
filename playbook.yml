@@ -1,0 +1,5 @@
+---
+# Playbook to configure the virtual ansible server
+- hosts: ansible
+  become: yes
+
