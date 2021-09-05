@@ -30,7 +30,7 @@ SCRIPT
 
 # This is a variable containing an installation script used on guest side to
 #   - check whether already done, if not
-#     - cresate a user 'pi' with password 'raspberry'
+#     - create a user 'pi' with password 'raspberry'
 #     - allow password based ssh login by commenting out the appropriate line in /etc/ssh/sshd_config
 $create_pi = <<-SCRIPT
 if [ -f /home/pi ]
@@ -62,6 +62,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.vm.hostname = "ansible"
     ansible.vm.box = "ubuntu/focal64"
     ansible.vm.network :private_network, ip: "192.168.60.3"
+    # remove key from known hosts after destroy
+    ansible.trigger.after :destroy do |trigger|
+      trigger.run = { inline: "ssh-keygen -R 192.168.60.3" }
+    end
     ansible.vm.synced_folder ".", "/vagrant", create: true, disabled: false
     # provide the private ssh key on that server
     ansible.vm.provision "file", source: "./keys/vagrant", destination: "/home/vagrant/.ssh/id_rsa"
@@ -87,6 +91,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     raspbian.vm.hostname = "raspbian"
     raspbian.vm.box = "debian/bullseye64"
     raspbian.vm.network :private_network, ip: "192.168.60.4"
+    # remove key from known hosts after destroy
+    raspbian.trigger.after :destroy do |trigger|
+      trigger.run = { inline: "ssh-keygen -R 192.168.60.4" }
+    end
     if Vagrant.has_plugin?("vagrant-vbguest")
       raspbian.vbguest.auto_update = false
     end
