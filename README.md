@@ -21,3 +21,6 @@ To start the ansible server, run<br>
 <br>
 To start the raspi-like server, run<br>
 <code>C:\Users\...\ansible-dev-env> vagrant up raspbian</code>
+<br>
+To start the armbian(debian)-like server, run<br>
+<code>C:\Users\...\ansible-dev-env> vagrant up armbian</code>
