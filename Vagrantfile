@@ -4,8 +4,7 @@
 #######################################################################################
 # This Vagrant file is to be used with VirtualBox only.
 # Before using this Vagrant file: 
-#  - Do a "vagrant plugin install vagrant-vbguest" to keep guest additions up to date
-#  - run a "ssh-keygen -q -t ecdsa -b 521 -C vagrant -f ./keys/vagrant"
+#  - Run a "ssh-keygen -q -t ecdsa -b 521 -C vagrant -f ./keys/vagrant"
 #    and do not enter a passphrase
 #######################################################################################
 
@@ -61,21 +60,23 @@ chage -d 0 root
 echo "created environment"
 SCRIPT
 
+# using debian buster as base image for all vm's. 
+# Can be changed globally here or individually within a specific vm's section
+# For versions buster and below use debian/contrib-...64 with vboxfs kernel
+# From bullsey on the modules are already included in debian/..64
+BASE_IMAGE = "debian/contrib-buster64"
+
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   if Vagrant.has_plugin?("vagrant-vbguest")
-    # Update Guest Additions in VirtualBox
-    #   - Set auto_update to false for a maachine, if you do NOT want to check the correct 
-    #     VirtualBox Guest Additions version when booting a machine
-    config.vbguest.auto_update = true
-    #   - Do NOT download the iso file from a webserver, use the local one
-    config.vbguest.no_remote = true
+    # globally disable an eventually existing vbguest plugin
+    config.vbguest.auto_update = false
   end
 
   # --- The ansible server
   config.vm.define "ansible", primary: true, autostart: true do |ansible|
     ansible.vm.hostname = "ansible"
-    ansible.vm.box = "ubuntu/focal64"
+    ansible.vm.box = BASE_IMAGE
     ansible.vm.network :private_network, ip: "192.168.60.3"
     # ensure to remove key from known hosts after destroy
     # so we won't have an issue with old key after rebuild
@@ -105,15 +106,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # --- A raspbian-lite like target, not automatically started
   config.vm.define "raspbian", autostart: false do |raspbian|
     raspbian.vm.hostname = "raspbian"
-    raspbian.vm.box = "debian/buster64"
+    raspbian.vm.box = BASE_IMAGE
     raspbian.vm.network :private_network, ip: "192.168.60.4"
     # ensure to remove key from known hosts after destroy
     # so we won't have an issue with old key after rebuild
     raspbian.trigger.after :destroy do |trigger|
       trigger.run = { inline: "ssh-keygen -R 192.168.60.4" }
-    end
-    if Vagrant.has_plugin?("vagrant-vbguest")
-      raspbian.vbguest.auto_update = false
     end
     # setup in raspbian style
     raspbian.vm.provision "shell", inline: $setup_raspbian
@@ -122,15 +120,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # --- An armbian-lite like target, not automatically started
   config.vm.define "armbian", autostart: false do |armbian|
     armbian.vm.hostname = "armbian"
-    armbian.vm.box = "debian/buster64"
+    armbian.vm.box = BASE_IMAGE
     armbian.vm.network :private_network, ip: "192.168.60.5"
     # ensure to remove key from known hosts after destroy
     # so we won't have an issue with old key after rebuild
     armbian.trigger.after :destroy do |trigger|
       trigger.run = { inline: "ssh-keygen -R 192.168.60.5" }
-    end
-    if Vagrant.has_plugin?("vagrant-vbguest")
-      armbian.vbguest.auto_update = false
     end
     # setup in armbian style
     armbian.vm.provision "shell", inline: $setup_armbian
