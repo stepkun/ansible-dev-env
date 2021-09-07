@@ -16,11 +16,17 @@ Therefore change into this environments root directory and run <br>
 <code>C:\Users\...\ansible-dev-env> ssh-keygen -q -t ecdsa -b 521 -C vagrant -f ./keys/vagrant</code>
 <br>For simplicity do not enter a password.<br>
 <br>
-To start the ansible server, run<br>
+To start the ansible server run<br>
 <code>C:\Users\...\ansible-dev-env> vagrant up</code>
+or
+<code>C:\Users\...\ansible-dev-env> vagrant up ansible</code>
 <br>
-To start the raspi-like server, run<br>
+To start the raspi-like server run<br>
 <code>C:\Users\...\ansible-dev-env> vagrant up raspbian</code>
 <br>
-To start the armbian(debian)-like server, run<br>
+To start the armbian(debian)-like server run<br>
 <code>C:\Users\...\ansible-dev-env> vagrant up armbian</code>
+<br>
+To start all of them run<br>
+<code>C:\Users\...\ansible-dev-env> vagrant up ansible raspbian armbian</code>
+<br>
