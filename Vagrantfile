@@ -4,28 +4,9 @@
 #######################################################################################
 # This Vagrant file is to be used with VirtualBox only.
 # Before using this Vagrant file: 
-#  - Run a "ssh-keygen -q -t ecdsa -b 521 -C vagrant -f ./keys/vagrant"
+#  - Run a "ssh-keygen -q -t ecdsa -b 521 -C ansible -f ./ansible/id_ecdsa"
 #    and do not enter a passphrase
 #######################################################################################
-
-# This is a variable containing an installation script used on guest side to
-#   - check whether already done, if not
-#     - create a backup of authorized_keys
-#     - add the necessary public_keys to the authorized_keys
-$add_public_keys = <<-SCRIPT
-pub_key=/vagrant/keys/vagrant.pub
-original=/home/vagrant/.ssh/authorized_keys
-backup=/home/vagrant/.ssh/authorized_keys_backup
-if [ -f $backup ]
-then
-  echo "appending public_keys was already done"
-else
-  cp $original $backup
-  chown vagrant.vagrant $backup
-  cat $pub_key >> $original
-  echo "appending public_keys is done"
-fi
-SCRIPT
 
 # This is a variable containing an installation script to setup
 # the guest in an raspbian lite like fashion
@@ -60,7 +41,7 @@ chage -d 0 root
 echo "created environment"
 SCRIPT
 
-# using debian buster as base image for all vm's. 
+# using debian buster as base image for all target vm's. 
 # Can be changed globally here or individually within a specific vm's section
 # For versions buster and below use debian/contrib-...64 with vboxfs kernel
 # From bullsey on the modules are already included in debian/..64
@@ -76,7 +57,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # --- The ansible server
   config.vm.define "ansible", primary: true, autostart: true do |ansible|
     ansible.vm.hostname = "ansible"
-    ansible.vm.box = BASE_IMAGE
+    # using ubuntu focal fossa as base allows simpler installation of ansible 
+    ansible.vm.box = 'ubuntu/focal64'
     ansible.vm.network :private_network, ip: "192.168.60.3"
     # ensure to remove key from known hosts after destroy
     # so we won't have an issue with old key after rebuild
@@ -84,23 +66,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       trigger.run = { inline: "ssh-keygen -R 192.168.60.3" }
     end
     ansible.vm.synced_folder ".", "/vagrant", create: true, disabled: false
-    # provide the private ssh key on that server
-    ansible.vm.provision "file", source: "./keys/vagrant", destination: "/home/vagrant/.ssh/id_ecdsa"
-    ansible.vm.provision "shell", inline: "chmod 0600 /home/vagrant/.ssh/id_ecdsa"
-    # add public ssh keys to authorized_hosts
-    ansible.vm.provision "shell", inline: $add_public_keys
-    # Get ansible installed on this box and do automatic provisioning of this box only
-    # No automatic provisioning of any of the other boxes from here!
-    ansible.vm.provision "ansible", type: "ansible_local" do |provisioner|
-      #provisioner.verbose = 'vvv'
-      provisioner.install = true
-      provisioner.playbook = "playbook.yml"
-      # explicitly setting these two variables allows to use those files also they are in "public" directories
-      provisioner.config_file = "/vagrant/ansible.cfg"
-      provisioner.inventory_path = "/vagrant/hosts.ini"
-      # ensure that only the ansible server is provisioned
-      provisioner.limit = "ansible"
-    end
+    # Get ansible installed
+    ansible.vm.provision "shell", inline: 'sudo apt-get install -y python3-software-properties'
+    ansible.vm.provision "shell", inline: 'sudo apt-add-repository -y ppa:ansible/ansible'
+    ansible.vm.provision "shell", inline: 'sudo apt-get install ansible -y'
+    # create ansible admn user
+    ansible.vm.provision "shell", path: './ansible/setup.sh'
   end
 
   # --- A raspbian-lite like target, not automatically started

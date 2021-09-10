@@ -1,5 +1,5 @@
 # Vagrant stuff
 .vagrant
 # ssh keys
-vagrant
-vagrant.pub
+id_ecdsa
+id_ecdsa.pub

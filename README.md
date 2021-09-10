@@ -13,7 +13,7 @@ On your workstation you need to download and install (if not already done)
 <br>
 Before using this environment you need to generate a pair of ssh-keys for the user vagrant.
 Therefore change into this environments root directory and run <br>
-<code>C:\Users\...\ansible-dev-env> ssh-keygen -q -t ecdsa -b 521 -C vagrant -f ./keys/vagrant</code>
+<code>C:\Users\...\ansible-dev-env> ssh-keygen -q -t ecdsa -b 521 -C ansible -f ./ansible/id_ecdsa</code>
 <br>For simplicity do not enter a password.<br>
 <br>
 To start the ansible server run<br>
