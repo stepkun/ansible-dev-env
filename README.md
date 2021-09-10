@@ -30,3 +30,4 @@ To start the armbian(debian)-like server run<br>
 To start all of them run<br>
 <code>C:\Users\...\ansible-dev-env> vagrant up ansible raspbian armbian</code>
 <br>
+You can log into the ansible server with 'ssh ansible@192.168.60.3', password is 'ansible'

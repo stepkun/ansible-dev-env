@@ -70,7 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.vm.provision "shell", inline: 'sudo apt-get install -y python3-software-properties'
     ansible.vm.provision "shell", inline: 'sudo apt-add-repository -y ppa:ansible/ansible'
     ansible.vm.provision "shell", inline: 'sudo apt-get install ansible -y'
-    # create ansible admn user
+    # create ansible admin user
     ansible.vm.provision "shell", path: './ansible/setup.sh'
   end
 
