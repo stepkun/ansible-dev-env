@@ -68,8 +68,8 @@ BASE_IMAGE = "debian/contrib-buster64"
 
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # globally disable an eventually existing vbguest plugin
   if Vagrant.has_plugin?("vagrant-vbguest")
-    # globally disable an eventually existing vbguest plugin
     config.vbguest.auto_update = false
   end
 
@@ -85,8 +85,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     ansible.vm.synced_folder ".", "/vagrant", create: true, disabled: false
     # provide the private ssh key on that server
-    ansible.vm.provision "file", source: "./keys/vagrant", destination: "/home/vagrant/.ssh/id_rsa"
-    ansible.vm.provision "shell", inline: "chmod 0600 /home/vagrant/.ssh/id_rsa"
+    ansible.vm.provision "file", source: "./keys/vagrant", destination: "/home/vagrant/.ssh/id_ecdsa"
+    ansible.vm.provision "shell", inline: "chmod 0600 /home/vagrant/.ssh/id_ecdsa"
     # add public ssh keys to authorized_hosts
     ansible.vm.provision "shell", inline: $add_public_keys
     # Get ansible installed on this box and do automatic provisioning of this box only
