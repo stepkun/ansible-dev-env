@@ -69,6 +69,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Get ansible installed together with sshpass
     ansible.vm.provision "shell", inline: 'sudo apt-get install -y python3-software-properties'
     ansible.vm.provision "shell", inline: 'sudo apt-add-repository -y ppa:ansible/ansible'
+    # do an upgrade if necessary. Update of package list is done on adding the repo
+    ansible.vm.provision "shell", inline: 'sudo apt-get upgrade -y'
     ansible.vm.provision "shell", inline: 'sudo apt-get install ansible sshpass -y'
     # create ansible admin user
     ansible.vm.provision "shell", path: './ansible/setup.sh'

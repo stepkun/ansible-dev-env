@@ -17,7 +17,8 @@ else
   mkdir /home/$user/.ssh
   chown $user.$user /home/$user/.ssh
   cp /vagrant/ansible/id_ecdsa* /home/$user/.ssh/
-  chown $user.$user /home/$user/.ssh/id_ecdsa*
-  chmod 0600 /home/$user/.ssh/id_ecdsa*
+  # everything in the .ssh dir should only be accessible by the user
+  chown $user.$user /home/$user/.ssh/*
+  chmod 0600 /home/$user/.ssh/*
   echo "created $user's environment"
 fi
