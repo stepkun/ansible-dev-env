@@ -66,10 +66,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       trigger.run = { inline: "ssh-keygen -R 192.168.60.3" }
     end
     ansible.vm.synced_folder ".", "/vagrant", create: true, disabled: false
-    # Get ansible installed
+    # Get ansible installed together with sshpass
     ansible.vm.provision "shell", inline: 'sudo apt-get install -y python3-software-properties'
     ansible.vm.provision "shell", inline: 'sudo apt-add-repository -y ppa:ansible/ansible'
-    ansible.vm.provision "shell", inline: 'sudo apt-get install ansible -y'
+    ansible.vm.provision "shell", inline: 'sudo apt-get install ansible sshpass -y'
     # create ansible admin user
     ansible.vm.provision "shell", path: './ansible/setup.sh'
   end
