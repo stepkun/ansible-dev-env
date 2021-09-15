@@ -5,7 +5,7 @@
 #   - create a user 'ansible' with password 'ansible'
 user=ansible
 password=ansible
-if [ -f /home/$user ]
+if [ -d /home/$user ]
 then
   echo "$user's environment already created"
 else
