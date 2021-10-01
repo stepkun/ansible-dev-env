@@ -103,4 +103,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # setup in armbian style
     armbian.vm.provision "shell", inline: $setup_armbian
   end
+
+  # --- A minikube target, not automatically started
+  config.vm.define "minikube", autostart: false do |minikube|
+    minikube.vm.hostname = "minikube"
+    minikube.vm.box = "ilionx/ubuntu2004-minikube"
+    minikube.vm.network :private_network, ip: "192.168.60.6"
+    # ensure to remove key from known hosts after destroy
+    # so we won't have an issue with old key after rebuild
+    minikube.trigger.after :destroy do |trigger|
+      trigger.run = { inline: "ssh-keygen -R 192.168.60.6" }
+    end
+    # update packages
+    minikube.vm.provision "shell", { inline: "sudo apt-get upgrade && sudo apt-get full-upgrade" }
+    # autostart minikube
+    minikube.vm.provision "shell", { inline: "minikube start" }
+  end
 end
